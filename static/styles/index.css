@@ -1,0 +1,71 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+/* BACKGROUND */
+body{
+    background-color: antiquewhite;
+    display: flex;
+    justify-content: right;
+    overflow: hidden;
+}
+#wave-bg-wrapper{
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    width: 45%;
+    background-color: #a2d9ff;
+}
+#wave-bg{
+    width: 120vh;
+    rotate: -85deg;
+    margin-left: -118%;
+}
+/* FORM */
+#form_body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+#form_cont{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: floralwhite;
+    border: 5px solid rgb(181, 170, 148);
+    border-radius: 15%;
+    margin: 0 25% 15% 0;
+    padding-top: 5%;
+    width: 35%;
+    height: 50%;
+}
+form{
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 8%;
+    height: 50%;
+    width: 60%;
+}
+.input_field{
+    margin-bottom: 15px;
+    width: 80%;
+    height: 15%;
+}
+#roles{
+    width: auto;
+}
+#role_label{
+    margin: 3% 8% 0 0;
+}
+#password_info{
+    display: none;
+    z-index: 80;
+}
+#password_icon ion-icon{
+    position: absolute;
+}
+#password_icon:hover #password_info{
+    display: block;
+}
