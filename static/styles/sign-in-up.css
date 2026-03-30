@@ -5,22 +5,33 @@
 }
 /* BACKGROUND */
 body{
-    background-color: antiquewhite;
     display: flex;
-    justify-content: right;
     overflow: hidden;
+}
+#left-bg{
+    background-color: antiquewhite;
+    width: 50%;
 }
 #wave-bg-wrapper{
     display: flex;
-    justify-content: center;
+    align-items: center;
     height: 100vh;
-    width: 45%;
+    width: 50%;
     background-color: #a2d9ff;
 }
 #wave-bg{
     width: 120vh;
     rotate: -85deg;
-    margin-left: -118%;
+    margin-left: -69vh;
+}
+#logo{
+    width: 50vh;
+    height: 50vh;
+    margin-left: -20%;
+}
+#title{
+    height: 10vh;
+    padding: 5% 0 0 5%;
 }
 /* FORM */
 #form_body{
@@ -28,6 +39,7 @@ body{
     justify-content: center;
     align-items: center;
     width: 100%;
+    height: 80vh;
 }
 #form_cont{
     display: flex;
@@ -36,10 +48,9 @@ body{
     background-color: floralwhite;
     border: 5px solid rgb(181, 170, 148);
     border-radius: 15%;
-    margin: 0 25% 15% 0;
-    padding-top: 5%;
-    width: 35%;
-    height: 50%;
+    padding: 5% 0 5% 0;
+    width: 45%;
+    height: fit-content;
 }
 form{
     display: flex;
@@ -61,11 +72,26 @@ form{
 }
 #password_info{
     display: none;
-    z-index: 80;
+    position: absolute;
+    margin-left: 20px;
+    padding: 1px 2px 1px 2px;
+    z-index: 10;
+    background-color: azure;
+    border: 2px solid black;
+    border-radius: 25%;
 }
 #password_icon ion-icon{
     position: absolute;
 }
 #password_icon:hover #password_info{
     display: block;
+}
+#sign-in{
+    font-size: 7pt;
+}
+#submit{
+    margin-top: 5%;
+}
+#alert{
+    position: absolute;
 }
