@@ -33,19 +33,22 @@ def sign_in():
 
 def errorDetect():
     check = False
-    if request.form['role'] and request.form['role'] == 'null':
-        flash('Invalid role selected. Please try again.', 'error')
-        check = True
-    if request.form['name'] and len(request.form['name']) < 1:
-        flash('No name entered. Please try again.', 'error')
-        check = True
-    if request.form['email'] and '@' not in request.form['email'] or '.edu' not in request.form['email']:
-        flash('Invalid email type, email must end in \'.edu\'. Please try again.', 'error')
-        check = True
-    if request.form['username'] and len(request.form['username']) < 1:
+    try:
+        if request.form['role'] == 'null':
+            flash('Invalid role selected. Please try again.', 'error')
+            check = True
+        if len(request.form['name']) < 1:
+            flash('No name entered. Please try again.', 'error')
+            check = True
+        if '@' not in request.form['email'] or '.edu' not in request.form['email']:
+            flash('Invalid email type, email must end in \'.edu\'. Please try again.', 'error')
+            check = True
+    except BaseException:
+        print('')
+    if len(request.form['username']) < 1:
         flash('No username entered. Please try again.', 'error')
         check = True
-    if request.form['password'] and len(request.form['password']) != 8:
+    if len(request.form['password']) != 8:
         flash('Invalid password, length must be 8 characters. Please try again.', 'error')
         check = True
     return check
