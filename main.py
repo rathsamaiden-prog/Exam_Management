@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, flash, redirect, url_for
-from sqlalchemy import create_engine, text, inspect
+from flask import Flask, render_template, request, flash, redirect, url_for, session
+from sqlalchemy import create_engine, text
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -17,17 +17,58 @@ def sign_up():
     if request.method == 'POST':
         if errorDetect():
             return redirect(url_for('sign_up'))
-        # conn.execute(text('INSERT INTO account VALUES (:acc_id, :role, :name, :email, :password)', request.form))
-        # conn.commit
-        return render_template('base.html')
+        conn.execute(text('INSERT INTO account (role, name, email, password) VALUES (:role, :name, :email, :password)'), request.form)
+        conn.commit()
+        if request.form['role'] == 'student':
+            return redirect(url_for('student_page'))
+        else:
+            return redirect(url_for('teacher_page'))
     return render_template('index.html')
 @app.route('/sign_in', methods=['GET', 'POST'])
 def sign_in():
     if request.method == 'POST':
         if errorDetect():
             return redirect(url_for('sign_in'))
-        return render_template('base.html')
+        user = conn.execute(text('SELECT * FROM account WHERE email = :email AND password = :password'), request.form).fetchone()
+        try: 
+            if user.acc_id is not None:
+                session['user_id'] = user.acc_id
+                session['role'] = user.role
+            if session.get('role') == 'student':
+                return redirect(url_for('student_page'))
+            else:
+                return redirect(url_for('teacher_page'))
+        except BaseException:
+            flash('Invalid or non-existent credentials. Please try again.', 'errror')
+            return redirect(url_for('sign_in'))
+        
     return render_template('sign_in.html')
+@app.route('/teacher_page')
+def teacher_page():
+    test_page_tb = conn.execute(text('SELECT ' \
+                                        't.test_id,'\
+                                        't.title,' \
+                                        'COUNT(q.question_id) AS question_count,' \
+                                        'a.name AS creator_name ' \
+                                    'FROM test t ' \
+                                    'JOIN account a ON t.created_by = a.acc_id ' \
+                                    'LEFT JOIN question q ON t.test_id = q.test_id ' \
+                                    'GROUP BY t.test_id, t.title, a.name;'))
+    return render_template('teacher_main.html', test_page_tb=test_page_tb)
+@app.route('/delete_test/<int:test_id>', methods=['POST'])
+def delete_test(test_id):
+    print(session['user_id'])
+    conn.execute(text('DELETE FROM test WHERE test_id=:id AND created_by=:user_id'),{'id':test_id, 'user_id':session.get('user_id')})
+    conn.commit()
+    return redirect('/teacher_page')
+
+
+@app.route('/student_page')
+def student_page():
+    # Add logic for student page as needed
+    return render_template('student_main.html')
+
+
 
 
 
@@ -45,9 +86,6 @@ def errorDetect():
             check = True
     except BaseException:
         print('')
-    if len(request.form['username']) < 1:
-        flash('No username entered. Please try again.', 'error')
-        check = True
     if len(request.form['password']) != 8:
         flash('Invalid password, length must be 8 characters. Please try again.', 'error')
         check = True

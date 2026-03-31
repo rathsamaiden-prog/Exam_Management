@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/styles/main-style.css">
+    <title>Document</title>
+</head>
+<body>
+    <div id="alert">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <h1>Tests</h1>
+    <div id="test_table">
+        {% for row in test_page_tb %}
+            <p>{{ row.title }}</p>
+            <p>{{ row.question_count }}</p>
+            <p>{{ row.creator_name }}</p>
+            <div class="test_cont">
+                <form action="" method="post">
+                    <input type="submit" name="edit" value="&#9998" class="teacher_cmds">
+                </form>
+                <form action="/delete_test/{{ row.test_id}}" method="POST">
+                    <input type="submit" name="delete" value="&#9747" class="teacher_cmds">
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
