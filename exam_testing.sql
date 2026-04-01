@@ -1,13 +1,4 @@
 use examdb;
-SELECT 
-    t.title,
-    COUNT(q.question_id) AS question_count,
-    a.name AS creator_name
-FROM test t
-JOIN account a ON t.created_by = a.acc_id
-LEFT JOIN question q ON t.test_id = q.test_id
-GROUP BY t.test_id, t.title, a.name;
-
 
 INSERT INTO account (role, name, email, password) VALUES
 ('teacher', 'Alice Johnson', 'alice@test.edu', 'pass1234'),
@@ -65,6 +56,3 @@ select * from grade;
 select * from question;
 select * from submission;
 select * from test;
-
-
-SELECT t.title, q.question_text FROM test t JOIN question q ON t.test_id = q.test_id WHERE t.test_id = 1;

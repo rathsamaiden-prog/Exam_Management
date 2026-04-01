@@ -49,6 +49,16 @@ body{
     align-items: center;
     width: 50%;
 }
+#create_form_cont{
+    position: absolute;
+    top: 15%;
+    right: 3%;
+}
+#create_form_cont input{
+    font-size: 15pt;
+    height: 5vh;
+    width: 5vh;
+}
 #edit{
     border-right: 1px solid black;
 }

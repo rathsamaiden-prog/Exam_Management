@@ -8,10 +8,10 @@
 </head>
 <body>
     <h1 id="title">{{test_title}}</h1>
-    <form action="" method="post" id="back-cont">
-        <input type="button" value="Back" id="back-btn">
+    <form action="/teacher_page" method="POST" id="back-cont">
+        <input type="submit" name="back" value="Back" id="back-btn">
     </form>
-    <form action="" method="POST" id="question_cont">
+    <form action="/edit_test/{{ test_id }}/{{ test_title }}" method="POST" id="question_cont">
         {% for q in test_questions %}
             <div class="question_rows">
                 <label class="question_labels">Question {{ loop.index }}</label>

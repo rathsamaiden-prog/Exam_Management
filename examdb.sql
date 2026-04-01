@@ -1,3 +1,5 @@
+drop database examdb;
+
 create database examdb;
 use examdb;
 
@@ -7,75 +9,40 @@ create table account(
     name varchar(255) not null,
     email varchar(255) not null,
     password char(8) not null
-);
+) ENGINE=InnoDB;
 create table test(
 		test_id int not null Primary Key auto_increment,
 		title varchar(40) not null,
 		created_by int not null,
     foreign key (created_by) references account(acc_id)
-);
+) ENGINE=InnoDB;
 create table question(
 		question_id int not null Primary Key auto_increment,
         test_id int not null,
         question_text text not null,
-	foreign key (test_id) references test(test_id)
-);
+	foreign key (test_id) references test(test_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
 create table submission(
 		submission_id int not null Unique Primary Key auto_increment,
         acc_id int not null,
         test_id int not null,
 	foreign key (acc_id) references account(acc_id),
-    foreign key (test_id) references test(test_id)
-);
+    foreign key (test_id) references test(test_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
 create table answer(
 		answer_id int not null Primary Key auto_increment,
         submission_id int not null,
         question_id int not null,
         answer_text text not null,
-	foreign key (submission_id) references submission(submission_id),
-    foreign key (question_id) references question(question_id)
-);
+	foreign key (submission_id) references submission(submission_id) ON DELETE CASCADE,
+    foreign key (question_id) references question(question_id) On DELETE CASCADE
+) ENGINE=InnoDB;
 create table grade(
 		grade_id int not null Unique Primary Key auto_increment,
         submission_id int not null,
         acc_id int not null,
         mark int,
-	foreign key (submission_id) references submission(submission_id),
+	foreign key (submission_id) references submission(submission_id) ON DELETE CASCADE,
     foreign key (acc_id) references account(acc_id)
-);
+) ENGINE=InnoDB;
 
-ALTER TABLE question
-DROP FOREIGN KEY question_ibfk_1;
-
-ALTER TABLE question
-ADD CONSTRAINT fk_question_test
-FOREIGN KEY (test_id)
-REFERENCES test(test_id)
-ON DELETE CASCADE;
-
-ALTER TABLE submission
-DROP FOREIGN KEY submission_ibfk_2;
-
-ALTER TABLE submission
-ADD CONSTRAINT fk_submission_test
-FOREIGN KEY (test_id)
-REFERENCES test(test_id)
-ON DELETE CASCADE;
-
-ALTER TABLE answer
-DROP FOREIGN KEY answer_ibfk_1;
-
-ALTER TABLE answer
-ADD CONSTRAINT fk_answer_submission
-FOREIGN KEY (submission_id)
-REFERENCES submission(submission_id)
-ON DELETE CASCADE;
-
-ALTER TABLE grade
-DROP FOREIGN KEY grade_ibfk_1;
-
-ALTER TABLE grade
-ADD CONSTRAINT fk_grade_submission
-FOREIGN KEY (submission_id)
-REFERENCES submission(submission_id)
-ON DELETE CASCADE;

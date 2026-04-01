@@ -18,12 +18,17 @@ def sign_up():
     if request.method == 'POST':
         if errorDetect():
             return redirect(url_for('sign_up'))
-        conn.execute(text('INSERT INTO account (role, name, email, password) VALUES (:role, :name, :email, :password)'), request.form)
-        conn.commit()
-        if request.form['role'] == 'student':
-            return redirect(url_for('student_page'))
+        user = conn.execute(text('SELECT * FROM account WHERE email = :email AND password = :password'), request.form).fetchone()
+        if user is None:
+            conn.execute(text('INSERT INTO account (role, name, email, password) VALUES (:role, :name, :email, :password)'), request.form)
+            conn.commit()
+            if request.form['role'] == 'student':
+                return redirect(url_for('student_page'))
+            else:
+                return redirect(url_for('teacher_page'))
         else:
-            return redirect(url_for('teacher_page'))
+            flash('Credentials already in use. Please try again.', 'errror')
+            return redirect(url_for('sign_up'))
     return render_template('index.html')
 
 @app.route('/sign_in', methods=['GET', 'POST'])
@@ -66,32 +71,44 @@ def errorDetect():
     return check
 
 # --------------- TEACHER PAGE AND FUNCS -------------------
-@app.route('/teacher_page')
+@app.route('/teacher_page', methods=['GET','POST'])
 def teacher_page():
+    user_id = session.get('user_id')
     test_page_tb = conn.execute(text('SELECT ' \
                                         't.test_id,'\
                                         't.title,' \
                                         'COUNT(q.question_id) AS question_count,' \
-                                        'a.name AS creator_name ' \
+                                        'a.name AS creator_name, ' \
+                                        'a.acc_id '
                                     'FROM test t ' \
                                     'JOIN account a ON t.created_by = a.acc_id ' \
                                     'LEFT JOIN question q ON t.test_id = q.test_id ' \
                                     'GROUP BY t.test_id, t.title, a.name;'))
-    return render_template('teacher_main.html', test_page_tb=test_page_tb)
+    return render_template('teacher_main.html', test_page_tb=test_page_tb, user_id=user_id)
 
-@app.route('/edit_test_page/<int:test_id>', methods=['GET','POST'])
+@app.route('/edit_test_page/<int:test_id>', methods=['POST'])
 def edit_test(test_id):
     test_title = conn.execute(text('SELECT title FROM test WHERE test_id = :test_id;'),{'test_id':test_id}).fetchone()[0]
     test_questions = conn.execute(text('SELECT q.question_text FROM test t JOIN question q ON t.test_id = q.test_id WHERE t.test_id = :test_id;'),{'test_id':test_id}).fetchall()
-    return render_template('edit_test.html',test_title=test_title, test_questions=test_questions)
+    return render_template('edit_test.html',test_title=test_title, test_questions=test_questions, test_id=test_id)
 
 @app.route('/delete_test/<int:test_id>', methods=['POST'])
 def delete_test(test_id):
-    print(session['user_id'])
     conn.execute(text('DELETE FROM test WHERE test_id=:id AND created_by=:user_id'),{'id':test_id, 'user_id':session.get('user_id')})
     conn.commit()
     return redirect('/teacher_page')
 
+@app.route('/edit_test/<int:test_id>/<string:title>', methods=['POST'])
+def create_test(test_id,title):
+    questions = request.form.getlist('questions')
+    conn.execute(text('DELETE FROM test WHERE test_id=:id AND created_by=:user_id'),{'id':test_id, 'user_id':session.get('user_id')})
+    conn.commit()
+    conn.execute(text('INSERT INTO test (test_id, title, created_by) VALUES (:test_id,:title,:user_id)'),{'test_id':test_id, 'title':title, 'user_id':session.get('user_id')})
+    conn.commit()
+    for _ in range(len(questions)):
+        conn.execute(text('INSERT INTO question (test_id, question_text) VALUES (:test_id,:questions)'),{'test_id':test_id, 'questions':questions[_]})
+        conn.commit()
+    return render_template('teacher_main.html')
 
 
 # --------------- STUDENT PAGE AND FUNCS -------------------
