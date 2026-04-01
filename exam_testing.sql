@@ -67,4 +67,4 @@ select * from submission;
 select * from test;
 
 
-SELECT DISTINCT * FROM test;
+SELECT t.title, q.question_text FROM test t JOIN question q ON t.test_id = q.test_id WHERE t.test_id = 1;

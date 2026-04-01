@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/styles/test-view.css">
+    <title>Document</title>
+</head>
+<body>
+    <h1 id="title">{{test_title}}</h1>
+    <form action="" method="post" id="back-cont">
+        <input type="button" value="Back" id="back-btn">
+    </form>
+    <form action="" method="POST" id="question_cont">
+        {% for q in test_questions %}
+            <div class="question_rows">
+                <label class="question_labels">Question {{ loop.index }}</label>
+                <input type="text" value='{{ q[0] }}' name="questions" class="questions">
+            </div>
+        {% endfor %}
+        <input type="submit" value="Commit Change">
+    </form>
+    <button type="button" id="add-btn">ADD QUESTION</button>
+    <button type="button" id="remove-btn">REMOVE QUESTION</button>
+
+    
+<script>
+    const addBtn = document.getElementById('add-btn')
+    const removeBtn = document.getElementById('remove-btn')
+    const container = document.getElementById('question_cont')
+
+    addBtn.addEventListener('click', function(){
+        const count = document.querySelectorAll('.question_rows').length + 1
+
+        const div = document.createElement('div')
+        div.classList.add('question_rows')
+
+        div.innerHTML = `
+            <label class="question_labels">Question ${count}</label>
+            <input type="text" placeholder="Enter here" name="questions" class="questions">
+        `
+        const submitBtn = container.querySelector('input[type="submit"]')
+        container.insertBefore(div, submitBtn)
+        container.scrollTop = container.scrollHeight
+    })
+
+    removeBtn.addEventListener('click', function(){
+        const rows = container.querySelectorAll('.question_rows')
+
+        if (rows.length > 0) {
+            rows[rows.length - 1].remove()
+        }
+    })
+</script>
+</body>
+</html>
