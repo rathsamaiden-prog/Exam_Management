@@ -39,9 +39,11 @@ def sign_in():
         user = conn.execute(text('SELECT * FROM account WHERE email = :email AND password = :password'), request.form).fetchone()
         try: 
             if user.acc_id is not None:
+                
                 session['user_id'] = user.acc_id
                 session['role'] = user.role
             if session.get('role') == 'student':
+                print('here')
                 return redirect(url_for('student_page'))
             else:
                 return redirect(url_for('teacher_page'))
@@ -87,10 +89,14 @@ def teacher_page():
     return render_template('teacher_main.html', test_page_tb=test_page_tb, user_id=user_id)
 
 @app.route('/edit_test_page/<int:test_id>', methods=['POST'])
-def edit_test(test_id):
+def edit_test_page(test_id):
     test_title = conn.execute(text('SELECT title FROM test WHERE test_id = :test_id;'),{'test_id':test_id}).fetchone()[0]
     test_questions = conn.execute(text('SELECT q.question_text FROM test t JOIN question q ON t.test_id = q.test_id WHERE t.test_id = :test_id;'),{'test_id':test_id}).fetchall()
     return render_template('edit_test.html',test_title=test_title, test_questions=test_questions, test_id=test_id)
+
+@app.route('/create_test_page', methods=['POST'])
+def create_test_page():
+    return render_template('create_test.html')
 
 @app.route('/delete_test/<int:test_id>', methods=['POST'])
 def delete_test(test_id):
@@ -99,29 +105,78 @@ def delete_test(test_id):
     return redirect('/teacher_page')
 
 @app.route('/edit_test/<int:test_id>/<string:title>', methods=['POST'])
-def create_test(test_id,title):
+def edit_test(test_id,title):
     questions = request.form.getlist('questions')
     conn.execute(text('DELETE FROM test WHERE test_id=:id AND created_by=:user_id'),{'id':test_id, 'user_id':session.get('user_id')})
     conn.commit()
     conn.execute(text('INSERT INTO test (test_id, title, created_by) VALUES (:test_id,:title,:user_id)'),{'test_id':test_id, 'title':title, 'user_id':session.get('user_id')})
     conn.commit()
     for _ in range(len(questions)):
-        conn.execute(text('INSERT INTO question (test_id, question_text) VALUES (:test_id,:questions)'),{'test_id':test_id, 'questions':questions[_]})
-        conn.commit()
+        if questions[_] != '':
+            conn.execute(text('INSERT INTO question (test_id, question_text) VALUES (:test_id,:questions)'),{'test_id':test_id, 'questions':questions[_]})
+            conn.commit()
     return render_template('teacher_main.html')
 
+@app.route('/create_test', methods=['POST'])
+def create_test():
+    title = request.form.get('title')
+    conn.execute(text('INSERT INTO test (title, created_by) VALUES (:title, :user_id)'),{'title':title, 'user_id':session.get('user_id')})
+    conn.commit()
+    questions = request.form.getlist('questions')
+    test_id = conn.execute(text('SELECT test_id FROM test WHERE title=:title and created_by=:user_id'),{'title':title, 'user_id':session.get('user_id')}).fetchone()[0]
+    for _ in range(len(questions)):
+        if questions[_] != '':
+            conn.execute(text('INSERT INTO question (test_id, question_text) VALUES (:test_id,:questions)'),{'test_id':test_id,'questions':questions[_]})
+            conn.commit()
+    return render_template('teacher_main.html')
 
 # --------------- STUDENT PAGE AND FUNCS -------------------
 @app.route('/student_page')
 def student_page():
-    # Add logic for student page as needed
-    return render_template('student_main.html')
+    user_id = session.get('user_id')
+    test_page_tb = conn.execute(text('SELECT ' \
+                                        't.test_id,'\
+                                        't.title,' \
+                                        'COUNT(q.question_id) AS question_count,' \
+                                        'a.name AS creator_name, ' \
+                                        'a.acc_id ' \
+                                    'FROM test t ' \
+                                    'JOIN account a ON t.created_by = a.acc_id ' \
+                                    'LEFT JOIN question q ON t.test_id = q.test_id ' \
+                                    'GROUP BY t.test_id, t.title, a.name;'))
+    check_submission = conn.execute(text('SELECT test_id FROM submission WHERE acc_id=:acc_id'),{'acc_id':user_id})
+    check_ids = [row[0] for row in check_submission]
+    return render_template('student_main.html', test_page_tb=test_page_tb, user_id=user_id, check_ids=check_ids)
 
+@app.route('/taking_test/<int:test_id>', methods=['POST'])
+def test_page(test_id):
+    test_title = conn.execute(text('SELECT title FROM test WHERE test_id = :test_id;'),{'test_id':test_id}).fetchone()[0]
+    test_questions = conn.execute(text('SELECT q.question_text FROM test t JOIN question q ON t.test_id = q.test_id WHERE t.test_id = :test_id;'),{'test_id':test_id}).fetchall()
+    return render_template('take_test.html',test_title=test_title, test_questions=test_questions, test_id=test_id)
 
+@app.route('/submit_test/<int:test_id>', methods=['POST'])
+def submit_test(test_id):
+    answers = request.form.getlist('answers')
+    conn.execute(text('INSERT INTO submission (acc_id, test_id) VALUES (:user_id, :test_id)'),{'user_id':session.get('user_id'), 'test_id':test_id})
+    conn.commit()
+    question_ids = conn.execute(text('SELECT q.question_id FROM test t JOIN question q ON t.test_id = q.test_id WHERE t.test_id = :test_id;'),{'test_id':test_id}).fetchall()
+    submission_id = conn.execute(text('SELECT submission_id FROM submission WHERE acc_id=:acc_id and test_id=:test_id'),{'acc_id':session.get('user_id'), 'test_id':test_id}).fetchone()[0]
+    for _ in range(len(answers)):
+        conn.execute(text('INSERT INTO answer (submission_id, question_id, answer_text) VALUES (:submission_id,:question_id,:answer)'),{'submission_id':submission_id,'question_id':question_ids[_][0],'answer':answers[_]})
+        conn.commit()
 
+    return redirect('/student_page')
 
+# ----------- SHARED FUNCS ---------------
+@app.route('/view_accounts', methods=['POST'])
+def view_accounts():
+    return
 
-
+@app.route('/log_out', methods=['POST'])
+def log_out():
+    session['user'] = ''
+    session['role'] = ''
+    return redirect('/sign_up')
 
 
 if __name__ == '__main__':

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/styles/test-view.css">
+    <title>Document</title>
+</head>
+<body>
+    <h1 id="title">{{test_title}}</h1>
+    <form action="/submit_test/{{ test_id }}" method="POST" id="question_cont">
+        {% for q in test_questions %}
+            <div class="question_rows">
+                <label class="question_labels">Question {{ loop.index }}</label>
+                <h2>{{ q[0] }}</h2>
+                <input type="text" name="answers" class="answers">
+            </div>
+        {% endfor %}
+        <input type="submit" value="Submit" id="submit">
+    </form>
+</body>
+</html>

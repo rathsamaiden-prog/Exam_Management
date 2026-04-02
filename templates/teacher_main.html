@@ -7,20 +7,16 @@
     <title>Document</title>
 </head>
 <body>
-    <div id="alert">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-            {% endif %}
-        {% endwith %}
+    <div id="account_cont">
+        <form action="" method="POST">
+            <input type="submit" name="accounts" value="&#x1F464" id="accounts">
+        </form>
+        <form action="" method="POST">
+            <input type="submit" name="log_out" value="Log Out" id="log_out">
+        </form>
     </div>
     <h1 id="title">Tests</h1>
-    <form action="/create_test" method="POST" id="create_form_cont">
+    <form action="/create_test_page" method="POST" id="create_form_cont">
         <input type="submit" name="create" value="&#128736">
     </form>
     <div id="test_table">

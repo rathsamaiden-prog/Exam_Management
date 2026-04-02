@@ -25,7 +25,9 @@ body{
     display: flex;
     flex-direction: column;
     width: 65%;
-    height: 90vh;
+    height: 85vh;
+    overflow-y: scroll;
+    margin-bottom: 5vh;
 }
 .test_cont{
     display: flex;
@@ -67,4 +69,27 @@ body{
 }
 .name{
     text-align: right;
+}
+#take_test{
+    width: fit-content;
+    margin-left: 3vh;
+}
+.student_cmds{
+    padding: 3px;
+}
+#account_cont{
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: 2.5vh;
+    right: 5%;
+    width: 18vh;
+}
+#accounts{
+    height: 5vh;
+    padding: 1px 3px;
+}
+#log_out{
+    height: 5vh;
+    padding: 1px 3px;
 }
