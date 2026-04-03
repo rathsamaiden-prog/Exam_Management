@@ -16,27 +16,28 @@
         </form>
     </div>
     <h1 id="title">Tests</h1>
-    {% if user_id == 'teacher' %}
-        <form action="/create_test_page" method="POST" id="create_form_cont">
-            <input type="submit" name="create" value="&#128736">
+    <form action="/completed_tests" method="POST" id="completed_tests_form">
+        <input type="submit" name="create" value="View completed">
+    </form>
+    {% if check %}
+        <form action="/student_page" method="POST" id="back-cont">
+            <input type="submit" name="back" value="Back" id="back-btn">
         </form>
     {% endif %}
     <div id="test_table">
         {% for row in test_page_tb %}
             <div class="test_cont">
                 <p>{{ row.title }}</p>
-                <p>{{ row.question_count }} Q's</p>
-                <p class="name">{{ row.creator_name }}</p>
-                {% if row.acc_id == user_id %}
-                    <div class="test_form_cont">
-                        <form action="/edit_test_page/{{row.test_id}}" method="POST" id="edit">
-                            <input type="submit" name="edit" value="&#9998" class="teacher_cmds">
-                        </form>
-                        <form action="/delete_test/{{row.test_id}}" method="POST" id="delete">
-                            <input type="submit" name="delete" value="&#9747" class="teacher_cmds">
-                        </form>
-                    </div>
+                {% if row.question_count is not defined %}
+                    {% if row.mark is none %}
+                        <p>Not graded</p>
+                    {% else %}
+                        <p>{{ row.mark }} pts</p>
+                    {% endif %}
                 {% else %}
+                    <p>{{ row.question_count }} Q's</p>
+                {% endif %}
+                <p class="name">{{ row.creator_name }}</p>
                     {% if row.test_id not in check_ids %}
                         <div class="test_form_cont">
                             <form action="/taking_test/{{row.test_id}}" method="POST" id="take_test">
@@ -44,7 +45,6 @@
                             </form>
                         </div>
                     {% endif %}
-                {% endif %}
             </div>
         {% endfor %}
     </div>

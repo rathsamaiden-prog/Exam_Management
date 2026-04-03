@@ -133,7 +133,7 @@ def create_test():
     return render_template('teacher_main.html')
 
 # --------------- STUDENT PAGE AND FUNCS -------------------
-@app.route('/student_page')
+@app.route('/student_page', methods=['GET','POST'])
 def student_page():
     user_id = session.get('user_id')
     test_page_tb = conn.execute(text('SELECT ' \
@@ -148,7 +148,27 @@ def student_page():
                                     'GROUP BY t.test_id, t.title, a.name;'))
     check_submission = conn.execute(text('SELECT test_id FROM submission WHERE acc_id=:acc_id'),{'acc_id':user_id})
     check_ids = [row[0] for row in check_submission]
-    return render_template('student_main.html', test_page_tb=test_page_tb, user_id=user_id, check_ids=check_ids)
+    return render_template('student_main.html', test_page_tb=test_page_tb, user_id=user_id, check_ids=check_ids, check=False)
+
+@app.route('/completed_tests', methods=['POST'])
+def completed_tests():
+    user_id = session.get('user_id')
+    completed_tests_tb = conn.execute(text('SELECT ' \
+                                        't.test_id,' \
+                                        't.title,' \
+                                        'a.name as creator_name,' \
+                                        'g.mark ' \
+                                    'FROM test t ' \
+                                    'JOIN account a ' \
+                                        'ON t.created_by = a.acc_id ' \
+                                    'LEFT JOIN submission s ' \
+                                        'ON t.test_id = s.test_id AND s.acc_id = :student_id ' \
+                                    'LEFT JOIN grade g ' \
+                                        'ON s.submission_id = g.submission_id ' \
+                                    'WHERE s.acc_id = :student_id;'), {'student_id':user_id})
+    check_submission = conn.execute(text('SELECT test_id FROM submission WHERE acc_id=:acc_id'),{'acc_id':user_id})
+    check_ids = [row[0] for row in check_submission]
+    return render_template('student_main.html', test_page_tb=completed_tests_tb, user_id=user_id, check_ids=check_ids, check=True)
 
 @app.route('/taking_test/<int:test_id>', methods=['POST'])
 def test_page(test_id):
@@ -172,9 +192,9 @@ def submit_test(test_id):
 # ----------- SHARED FUNCS ---------------
 @app.route('/view_accounts', methods=['POST'])
 def view_accounts():
-    user_id = session.get('user_id')
+    role = session.get('role')
     accounts_tb = conn.execute(text('SELECT role, name FROM account;'))
-    return render_template('view_accounts.html', accounts_tb=accounts_tb, user_id=user_id)
+    return render_template('view_accounts.html', accounts_tb=accounts_tb, role=role)
 
 @app.route('/view_accounts_students', methods=['POST'])
 def view_accounts_students():

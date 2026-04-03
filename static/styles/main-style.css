@@ -95,6 +95,18 @@ body{
 .student_cmds{
     padding: 3px;
 }
+#completed_tests_form input{
+    position: absolute;
+    top: 20%;
+    right: 5%;
+    padding: 3px 5px;
+}
+#back-btn{
+    position: absolute;
+    top: 15%;
+    right: 5%;
+    padding: 3px 5px;
+}
 /* ACCOUNTS PAGE */
 #account_table{
     display: flex;
