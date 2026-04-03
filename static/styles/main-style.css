@@ -20,7 +20,7 @@ body{
     font-size: 40pt;
     border-bottom: solid 5px black;
 }
-/* TEST_TABLE */
+/* SHARED FORMAT */
 #test_table{
     display: flex;
     flex-direction: column;
@@ -56,26 +56,8 @@ body{
     top: 15%;
     right: 3%;
 }
-#create_form_cont input{
-    font-size: 15pt;
-    height: 5vh;
-    width: 5vh;
-}
-#edit{
-    border-right: 1px solid black;
-}
-#delete{
-    border-left: 1px solid black;
-}
 .name{
     text-align: right;
-}
-#take_test{
-    width: fit-content;
-    margin-left: 3vh;
-}
-.student_cmds{
-    padding: 3px;
 }
 #account_cont{
     display: flex;
@@ -92,4 +74,71 @@ body{
 #log_out{
     height: 5vh;
     padding: 1px 3px;
+}
+/* TEACHER PAGE */
+#create_form_cont input{
+    font-size: 15pt;
+    height: 5vh;
+    width: 5vh;
+}
+#edit{
+    border-right: 1px solid black;
+}
+#delete{
+    border-left: 1px solid black;
+}
+/* STUDENT PAGE */
+#take_test{
+    width: fit-content;
+    margin-left: 3vh;
+}
+.student_cmds{
+    padding: 3px;
+}
+/* ACCOUNTS PAGE */
+#account_table{
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    height: 70vh;
+    overflow-y: scroll;
+}
+#account_title{
+    display: flex;
+    width: 60%;
+    height: 5%;
+    margin-top: 3%;
+}
+.account_cont{
+    display: flex;
+    width: 100%;
+    height: 5%;
+}
+.account_info{
+    width: 50%;
+    font-size: large;
+    border: 1px solid black;
+}
+.even{
+    background-color: aliceblue;
+}
+.odd{
+    background-color: bisque;
+}
+.account_titles{
+    font-size: xx-large;
+    text-align: center;
+}
+#filter{
+    position: absolute;
+    top: 15%;
+    right: 5%;
+    width: 8%;
+}
+#filter form{
+    margin-bottom: 5px;
+}
+#filter form input{
+    padding: 3px 5px;
+    width: 100%;
 }

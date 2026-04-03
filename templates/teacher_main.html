@@ -8,10 +8,10 @@
 </head>
 <body>
     <div id="account_cont">
-        <form action="" method="POST">
+        <form action="/view_accounts" method="POST">
             <input type="submit" name="accounts" value="&#x1F464" id="accounts">
         </form>
-        <form action="" method="POST">
+        <form action="/log_out" method="POST">
             <input type="submit" name="log_out" value="Log Out" id="log_out">
         </form>
     </div>
@@ -23,7 +23,7 @@
         {% for row in test_page_tb %}
             <div class="test_cont">
                 <p>{{ row.title }}</p>
-                <p>{{ row.question_count }} Q's</p>
+                <p>{{ attempts[loop.index0] }} attempts</p>
                 <p class="name">{{ row.creator_name }}</p>
                 {% if row.acc_id == user_id %}
                     <div class="test_form_cont">

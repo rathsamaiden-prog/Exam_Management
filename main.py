@@ -86,7 +86,9 @@ def teacher_page():
                                     'JOIN account a ON t.created_by = a.acc_id ' \
                                     'LEFT JOIN question q ON t.test_id = q.test_id ' \
                                     'GROUP BY t.test_id, t.title, a.name;'))
-    return render_template('teacher_main.html', test_page_tb=test_page_tb, user_id=user_id)
+    num_attempts_tb = conn.execute(text('SELECT count(*) FROM submission GROUP BY test_id;'))
+    attempts = [row[0] for row in num_attempts_tb]
+    return render_template('teacher_main.html', test_page_tb=test_page_tb, user_id=user_id, attempts=attempts)
 
 @app.route('/edit_test_page/<int:test_id>', methods=['POST'])
 def edit_test_page(test_id):
@@ -170,13 +172,28 @@ def submit_test(test_id):
 # ----------- SHARED FUNCS ---------------
 @app.route('/view_accounts', methods=['POST'])
 def view_accounts():
-    return
+    user_id = session.get('user_id')
+    accounts_tb = conn.execute(text('SELECT role, name FROM account;'))
+    return render_template('view_accounts.html', accounts_tb=accounts_tb, user_id=user_id)
+
+@app.route('/view_accounts_students', methods=['POST'])
+def view_accounts_students():
+    user_id = session.get('user_id')
+    accounts_tb = conn.execute(text('SELECT role, name FROM account WHERE role = "student";'))
+    return render_template('view_accounts.html', accounts_tb=accounts_tb, user_id=user_id)
+
+@app.route('/view_accounts_teachers', methods=['POST'])
+def view_accounts_teachers():
+    user_id = session.get('user_id')
+    accounts_tb = conn.execute(text('SELECT role, name FROM account WHERE role = "teacher";'))
+    return render_template('view_accounts.html', accounts_tb=accounts_tb, user_id=user_id)
 
 @app.route('/log_out', methods=['POST'])
 def log_out():
     session['user'] = ''
     session['role'] = ''
     return redirect('/sign_up')
+
 
 
 if __name__ == '__main__':

@@ -57,4 +57,4 @@ select * from question;
 select * from submission;
 select * from test;
 
-DELETE from submission where submission_id = 12;
+SELECT role, name FROM account;
